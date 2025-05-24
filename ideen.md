@@ -1,0 +1,2 @@
+- labyrinth mit simulated annealing
+- heuristik um fitness zu bewerten
