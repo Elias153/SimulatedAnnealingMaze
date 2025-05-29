@@ -11,6 +11,7 @@ class SimulatedAnnealing:
 
     def __init__(self):
         # Labyrinth: 0 = frei, 1 = Wand
+
         self.maze = [
             [0, 1, 0, 0, 0, 1, 0, 0, 1, 0],
             [0, 1, 0, 1, 0, 1, 1, 0, 1, 0],
@@ -23,14 +24,44 @@ class SimulatedAnnealing:
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
         ]
+
         self.start = (0, 0)
         self.goal = (9, 9)
+
+        self.maze = [
+            [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1],
+            [1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1],
+            [1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1],
+            [1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1],
+            [1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1],
+            [1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1],
+            [1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1],
+            [1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1],
+            [1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1],
+            [1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1],
+            [1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1],
+            [1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1],
+            [1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1],
+            [1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1],
+            [1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]
+        ]
+        self.start = (1, 1)
+        self.goal = (18, 18)
+
         self.rows = len(self.maze)
         self.cols = len(self.maze[0])
         self.directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
     def manhattan(self, pos1, pos2):
         return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
+
+    def euclidean(self, a, b):
+        return np.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
 
     def get_neighbors(self, pos):
         neighbors = []
@@ -40,7 +71,7 @@ class SimulatedAnnealing:
                 neighbors.append((new_r, new_c))
         return neighbors
 
-    def run(self, max_iter=10000, temp=500, alpha=0.85):
+    def run(self, max_iter=100000, temp=1000, alpha=0.99):
         current = self.start
         parent = {self.start: None}
 
@@ -53,7 +84,7 @@ class SimulatedAnnealing:
                 return None
 
             next_pos = random.choice(neighbors)
-            delta = self.manhattan(current, self.goal) - self.manhattan(next_pos, self.goal)
+            delta = self.euclidean(current, self.goal) - self.euclidean(next_pos, self.goal)
 
             if delta > 0 or random.random() < math.exp(-abs(delta) / temp):
                 # Only update parent if move is accepted
@@ -76,8 +107,8 @@ class SimulatedAnnealing:
         else:
             return None
 
-    @staticmethod
-    def evaluate_sa(algorithm, runs=100):
+    def evaluate_sa(self,algorithm, runs=100):
+        plot_first_success = True
         successes = 0
         path_lengths = []
         times = []
@@ -88,6 +119,9 @@ class SimulatedAnnealing:
             duration = time.time() - start_time
 
             if path:
+                if plot_first_success:
+                    self.plot_maze_path(path)
+                    plot_first_success = False
                 successes += 1
                 path_lengths.append(len(path))
                 times.append(duration)
@@ -128,7 +162,7 @@ class SimulatedAnnealing:
 if __name__ == "__main__":
     # Instanziierung und Ausführung
     sa = SimulatedAnnealing()
-    results = SimulatedAnnealing.evaluate_sa(sa, runs=100)
+    results = sa.evaluate_sa(sa, runs=100)
 
     success_rate = results["success_rate"]
    # average_path_length = results["average_path_length"]
@@ -143,6 +177,6 @@ if __name__ == "__main__":
 
 
 
-    path = sa.run()
-    sa.plot_maze_path(path)
+    #path = sa.run()
+    #sa.plot_maze_path(path)
 
