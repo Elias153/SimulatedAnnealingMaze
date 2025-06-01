@@ -11,7 +11,7 @@ class SimulatedAnnealing:
 
     def __init__(self):
         # Labyrinth: 0 = frei, 1 = Wand
-
+        '''
         self.maze = [
             [0, 1, 0, 0, 0, 1, 0, 0, 1, 0],
             [0, 1, 0, 1, 0, 1, 1, 0, 1, 0],
@@ -27,7 +27,7 @@ class SimulatedAnnealing:
 
         self.start = (0, 0)
         self.goal = (9, 9)
-
+        '''
         self.maze = [
             [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             [1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1],
@@ -75,7 +75,7 @@ class SimulatedAnnealing:
         current = self.start
         parent = {self.start: None}
 
-        for _ in range(max_iter):
+        for i in range(max_iter):
             if current == self.goal:
                 break
 
@@ -93,8 +93,12 @@ class SimulatedAnnealing:
                 current = next_pos
 
             temp *= alpha
-            if temp < 1e-3:
+            if temp < 1e-6:
                 break
+
+            if i == max_iter:
+                print("limit reached")
+
 
         # Reconstruct clean path
         if current == self.goal:
@@ -107,7 +111,7 @@ class SimulatedAnnealing:
         else:
             return None
 
-    def evaluate_sa(self,algorithm, runs=100):
+    def evaluate_sa(self,algorithm, runs=500):
         plot_first_success = True
         successes = 0
         path_lengths = []
@@ -162,7 +166,7 @@ class SimulatedAnnealing:
 if __name__ == "__main__":
     # Instanziierung und Ausführung
     sa = SimulatedAnnealing()
-    results = sa.evaluate_sa(sa, runs=100)
+    results = sa.evaluate_sa(sa, runs=500)
 
     success_rate = results["success_rate"]
    # average_path_length = results["average_path_length"]
